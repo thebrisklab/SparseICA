@@ -2,7 +2,7 @@
 
 ## 1. Data
 
-You can directly use `X.csv` and `S.csv` as the generated observed data and true signal data. Or you can do it by yourself after loading the `jngcaFunctions.R`. Thanks to Benjamin Risk （<brisk@emory.edu>） for the functions.  
+You can directly use `X.csv` and `S.csv` as the generated observed data and true signal data. Or you can do it by yourself after loading the `jngcaFunctions.R`. Thanks to Dr. Benjamin Risk (<brisk@emory.edu>) for the functions.  
 
 ## 2. Refined ICA
 
@@ -15,5 +15,5 @@ You can have the following choices:
 + FastICA logistic We directly embedded the codes of `FastICA`  for it. So it is just to call the `FastICA` codes with logistic density. 
 + FastICA tanh: This is also the `FastICA`  codes, under tanh function. 
 
-Note: For *relax_laplace* and *relax_logistic* algorithms, you can check the convergence situation by using `converge_plot = T`. However, there is no convergence plot for FastICA methods, since the embedded codes didn't allow the convergence plot. 
+Note: For *"relax_laplace"* and *"relax_logistic"* algorithms, you can check the convergence situation by using `converge_plot = T`. However, there is no convergence plot for `FastICA` methods, since the embedded codes doesn't allow the convergence plot. 
 
