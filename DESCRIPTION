@@ -1,0 +1,23 @@
+Package: SparseICA
+Type: Package
+Title: Sparse Independent Component Analysis
+Version: 0.1.0
+Date: 2023-08-28
+Author: Zihang Wang, Irina Gaynanova, Aleksandr Aravkin, Benjamin B. Risk
+Maintainer: Zihang Wang <zihang.wang@emory.edu>
+Description: A novel Sparse ICA method that enables sparse estimation of independent source components by solving a non-smooth non-convex optimization problem via the relax-and-split framework. The Sparse ICA balances statistical independence and sparsity simultaneously and is computationally fast.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo
+Imports: 
+    Rcpp (>= 1.0.9),
+    MASS (>= 7.3-58.1),
+    RcppArmadillo (>= 0.12.0.0.0),
+    irlba (>= 2.3.5),
+    clue (>= 0.3)
+Depends: 
+    R (>= 4.1.0)
