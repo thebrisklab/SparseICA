@@ -23,14 +23,28 @@ if(!require(c("Rcpp","RcppArmadillo","MASS","irlba","clue","devtools"))){
 }
 ```
 
-You can install Sparse ICA from github with:
+Then you can install Sparse ICA from github with:
 
 ``` r
 library(devtools)
 install_github("thebrisklab/SparseICA")
 ```
 
+## Quick start guide
 
+### Load package and example data
+
+``` r
+# Load the package
+library(SparseICA)
+
+# Load the example data
+data(example_sim123)
+```
+
+### Visualization of example data
+
+The data has
 
 
 
