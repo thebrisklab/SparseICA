@@ -1,6 +1,6 @@
 # SparseICA
 
-Sparse ICA (Sparse Independent Component Analysis), a novel ICA method that enables sparse estimation of independent source components.
+Sparse ICA (Sparse Independent Component Analysis) is a novel ICA method that enables sparse estimation of independent source components.
 
 ## Installation
 
@@ -19,7 +19,7 @@ You can install them by running this code:
 
 ```r
 if(!require(c("Rcpp","RcppArmadillo","MASS","irlba","clue","devtools"))){
-    install.packages("c("Rcpp","RcppArmadillo","MASS","irlba","clue")")
+    install.packages(c("Rcpp","RcppArmadillo","MASS","irlba","clue","devtools"))
 }
 ```
 
