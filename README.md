@@ -121,6 +121,7 @@ image(matrix(-smat[,2],33))
 image(matrix(-smat[,3],33))
 par(mfrow=c(1,1))
 ```
+<img src="fig/true123.png" width="1376" />
 
 - The true time series in the mixing matrix - `mmat`:
 ```r
@@ -130,6 +131,7 @@ plot(mmat[2,],type = "l",xlab = "Time",ylab = "")
 plot(mmat[3,],type = "l",xlab = "Time",ylab = "")
 par(mfrow=c(1,1))
 ```
+<img src="fig/trueM.png" width="1376" />
 
 - The simulated data matrix at three time points - `xmat`:
 ```r
@@ -139,6 +141,7 @@ image(matrix(xmat[,23],33))
 image(matrix(xmat[,35],33))
 par(mfrow=c(1,1))
 ```
+<img src="fig/xmat.png" width="1376" />
 
 ### 2. Tuning parameter selection
 - Select the best tuning parameter `nu` using `BIC_sparseICA` function.
@@ -157,6 +160,8 @@ select_sparseICA = BIC_sparseICA_Rcpp(xData = xmat, n.comp = 3,U.list=NULL,
                                    nu_list = seq(0.1,4,0.1))
 my_nu = select_sparseICA$best_nu
 ```
+<img src="fig/BIC.png" width="1376" />
+
 The best `nu` is 1.2.
 
 
@@ -187,6 +192,7 @@ image(matrix(-matched_res$S[,2],33,33))
 image(matrix(-matched_res$S[,3],33,33))
 par(mfrow=c(1,1))
 ```
+<img src="fig/estS.png" width="1376" />
 
 - Check the estimated time series in the mixing matrix.
 ```r
@@ -196,6 +202,7 @@ plot(matched_res$M[2,],type = "l",xlab = "Time",ylab = "")
 plot(matched_res$M[3,],type = "l",xlab = "Time",ylab = "")
 par(mfrow=c(1,1))
 ```
+<img src="fig/estM.png" width="1376" />
 
 - Check the correlations.
 ```r
