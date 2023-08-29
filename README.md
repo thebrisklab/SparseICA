@@ -121,7 +121,7 @@ image(matrix(-smat[,2],33))
 image(matrix(-smat[,3],33))
 par(mfrow=c(1,1))
 ```
-<img src="fig/true123.png" width="1376" />
+<img src="fig/true123.png" width="1200" />
 
 - The true time series in the mixing matrix - `mmat`:
 ```r
