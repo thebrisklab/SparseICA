@@ -9,14 +9,13 @@ BIC_sparseICA(
   n.comp,
   nu_list = seq(0.1, 4, 0.1),
   U.list = NULL,
-  whiten = c("eigenvec", "sqrtprec", "none"),
+  whiten = c("eigenvec", "sqrtprec", "lngca", "none"),
   orth.method = c("svd", "givens"),
   method = c("C", "R"),
-  restarts.pbyd = 40,
   lambda = sqrt(2)/2,
   irlba = FALSE,
   eps = 1e-06,
-  maxit.laplace = 500,
+  maxit = 500,
   verbose = FALSE,
   col.stand = TRUE,
   row.stand = FALSE,
@@ -33,13 +32,11 @@ BIC_sparseICA(
 
 \item{U.list}{The initialization of U matrix. Default is "NULL".}
 
-\item{whiten}{The method for whitening input xData. Could take "eigenvec", "sqrtprec", and "none". The default is "eigenvec".}
+\item{whiten}{The method for whitening input xData. Could take "eigenvec", "sqrtprec", "lngca", and "none". The default is "eigenvec".}
 
 \item{orth.method}{The method used for generating initial values of U matrix. The default is "svd".}
 
 \item{method}{If method == "C" (default) then C code is used for Sparse ICA. If method == "R" then computations are done exclusively in R.}
-
-\item{restarts.pbyd}{The number of initial points. Default is 40.}
 
 \item{lambda}{The scale parameter in Laplace density. The default is sqrt(2)/2 to make the default situation with unit variance.}
 
@@ -47,7 +44,7 @@ BIC_sparseICA(
 
 \item{eps}{The convergence threshold. The default is 1e-6.}
 
-\item{maxit.laplace}{The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.}
+\item{maxit}{The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.}
 
 \item{verbose}{Whether print the information about convergence. The default is FALSE.}
 
@@ -75,9 +72,8 @@ Use BIC-like criterion to select tuning parameter nu in Sparse ICA.
 data(example_sim123)
 
 select_sparseICA = BIC_sparseICA(xData = xmat, n.comp = 3,U.list=NULL,
-    whiten = "eigenvec", orth.method="svd", method="C",
-    restarts.pbyd = 40, lambda = sqrt(2)/2,
-    eps = 1e-6,maxit.laplace = 500, BIC_plot = TRUE,verbose=FALSE,
+    whiten = "eigenvec", orth.method="svd", method="C", lambda = sqrt(2)/2,
+    eps = 1e-6,maxit = 500, BIC_plot = TRUE,verbose=FALSE,
     nu_list = seq(0.1,4,0.1))
 
 my_nu = select_sparseICA$best_nu

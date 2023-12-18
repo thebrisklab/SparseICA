@@ -150,14 +150,14 @@ soft_thresh_R = function(x, nu = 1, lambda = sqrt(2)/2) {
 #' @param n.comp The number of components.
 #' @param nu the tuning parameter controlling the accuracy and sparsity of the results. Should be selected by the BIC-like criterion "BIC_sparseICA_R()" or expert knowledge. The default is 1.
 #' @param U.list The initialization of U matrix. Default is "NULL".
-#' @param whiten The method for whitening input xData. Could take "eigenvec", "sqrtprec", and "none". The default is "eigenvec".
+#' @param whiten The method for whitening input xData. Could take "eigenvec", "sqrtprec", "lngca", and "none". The default is "eigenvec".
 #' @param orth.method The method used for generating initial values of U matrix. The default is "svd".
 #' @param method If method == "C" (default) then C code is used to perform most of the computations, which makes the algorithm run faster. If method == "R" then computations are done exclusively in R.
-#' @param restarts.pbyd The number of initial points. Default is 40.
+#' @param restarts The number of initial points. Default is 40.
 #' @param lambda The scale parameter in Laplace density. The default is sqrt(2)/2 to make the default situation with unit variance.
 #' @param irlba Whether use the irlba method to perform fast truncated singular value decomposition in whitening step. The default is FALSE.
 #' @param eps The convergence threshold. The default is 1e-6.
-#' @param maxit.laplace The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.
+#' @param maxit The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.
 #' @param verbose Whether print the information about convergence. The default is FALSE.
 #' @param converge_plot Whether make a convergence plot for Sparse ICA method. The default is FALSE.
 #' @param col.stand Whether standardize the data matrix column-wise. Default if TRUE.
@@ -186,8 +186,8 @@ soft_thresh_R = function(x, nu = 1, lambda = sqrt(2)/2) {
 #' data(example_sim123)
 #'
 #' my_sparseICA = sparseICA(xData = xmat, n.comp = 3, nu = 1.2, U.list=NULL,
-#'     whiten = "eigenvec", orth.method = "svd", method="C",restarts.pbyd = 40,
-#'     lambda = sqrt(2)/2, eps = 1e-6, maxit.laplace = 500, verbose=TRUE)
+#'     whiten = "eigenvec", orth.method = "svd", method="C",restarts = 40,
+#'     lambda = sqrt(2)/2, eps = 1e-6, maxit = 500, verbose=TRUE)
 #'
 #' a=matchICA(my_sparseICA$estS,smat)
 #'
@@ -197,7 +197,7 @@ soft_thresh_R = function(x, nu = 1, lambda = sqrt(2)/2) {
 #' image(matrix(a[,3],33,33))
 #' par(mfrow=c(1,1))
 #' }
-sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrtprec','none'),orth.method=c('svd','givens'), method = c("C","R"),restarts.pbyd = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit.laplace = 500, verbose=FALSE, converge_plot = FALSE,col.stand=TRUE, row.stand=FALSE, iter.stand=0){
+sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrtprec','lngca','none'),orth.method=c('svd','givens'), method = c("C","R"),restarts = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit = 500, verbose=FALSE, converge_plot = FALSE,col.stand=TRUE, row.stand=FALSE, iter.stand=0){
 
   start.time = Sys.time()
 
@@ -244,11 +244,16 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
     xData = temp$Z
     whitener = temp$whitener
     rm(temp)
-  }  else if (whiten=='sqrtprec') {
+  }else if (whiten=='sqrtprec') {
     est.sigma = cov(xData)  ## Use eigenvalue decomposition rather than SVD.
     evd.sigma = svd(est.sigma)
     whitener = evd.sigma$u%*%diag(evd.sigma$d^(-1/2))%*%t(evd.sigma$u)
     xData = xData%*%whitener
+  }else if (whiten=='lngca'){
+    temp = whitener(X = xData,n.comp = (t-1),irlba=irlba)
+    xData = temp$Z
+    whitener = temp$whitener
+    rm(temp)
   }else {
     whitener = diag(d)
   }
@@ -261,7 +266,7 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
 
   # Randomly make an input for U(0), by default here used orth.method = "svd"
   if (is.null(U.list)){
-    U.list = gen.inits(p=d, d=d, runs = restarts.pbyd, orth.method=orth.method)
+    U.list = gen.inits(p=d, d=d, runs = restarts, orth.method=orth.method)
   }
   runs = length(U.list)
 
@@ -279,14 +284,14 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
   if (verbose){
     cat("Start Sparse ICA, using ",runs," different random initializations. The convergence criterion is ",eps,".\n")
   }
-  for (k in 1:runs) {  # make a list if restarts.pbyd > 1, we should update the index of U.list if restarts.pbyd > 1
+  for (k in 1:runs) {  # make a list if restarts > 1, we should update the index of U.list if restarts > 1
     # Initial value of V(0)
     newV = xData %*% U.list[[k]]
     #lagV = newV
     lagU = diag(nrow = d)
 
     # loop for relax_laplace
-    for (i in 1:maxit.laplace) {
+    for (i in 1:maxit) {
       iteration = i
       # update U:
       txv = t(xData)%*%newV
@@ -308,7 +313,7 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
 
     #m=m+1
     # # Store Warning
-    # if(iteration==maxit.laplace){
+    # if(iteration==maxit){
     #   #cat("Does not converage!\n")
     #   m=m+1
     # }
@@ -361,7 +366,7 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
 
     # Randomly make an input for U(0), by default here used orth.method = "svd"
     if (is.null(U.list)){
-      U.list = gen.inits(p=d, d=d, runs = restarts.pbyd, orth.method=orth.method)
+      U.list = gen.inits(p=d, d=d, runs = restarts, orth.method=orth.method)
     }
     runs = length(U.list)
 
@@ -378,7 +383,7 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
     # Store log likelihood
     #loglik = c()
 
-    final_Rcpp=runs_relax_laplace(xData,U.list,runs,n.comp,nu,lambda,maxit.laplace,eps)
+    final_Rcpp=runs_relax_laplace(xData,U.list,runs,n.comp,nu,lambda,maxit,eps)
 
     # if(verbose){
     #   cat("MESSAGE: Sparse ICA converges (<",eps,") in",sum(final_Rcpp$converge!=0),"iterations using",runs,"different random initiations!\n")
@@ -396,7 +401,7 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
     out.list$converge = final_Rcpp$converge
     out.list$distribution = "Laplace"
     out.list$whitener = whitener
-    #out.list$estM = est.M.ols(out.list$estS,xData_centered)
+    out.list$estM = est.M.ols(out.list$estS,xData_centered)
 
     if (converge_plot) {
       plot(out.list$converge[which(out.list$converge!=0)], main = "Convergence Plot", xlab = "Iteration", ylab = "Norm Difference", type = "o")
@@ -424,14 +429,13 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
 #' @param n.comp The number of components.
 #' @param nu_list the list of candidate tuning parameter. Default is seq(0.1,4,0.1).
 #' @param U.list The initialization of U matrix. Default is "NULL".
-#' @param whiten The method for whitening input xData. Could take "eigenvec", "sqrtprec", and "none". The default is "eigenvec".
+#' @param whiten The method for whitening input xData. Could take "eigenvec", "sqrtprec", "lngca", and "none". The default is "eigenvec".
 #' @param orth.method The method used for generating initial values of U matrix. The default is "svd".
 #' @param method If method == "C" (default) then C code is used for Sparse ICA. If method == "R" then computations are done exclusively in R.
-#' @param restarts.pbyd The number of initial points. Default is 40.
 #' @param lambda The scale parameter in Laplace density. The default is sqrt(2)/2 to make the default situation with unit variance.
 #' @param irlba Whether use the irlba method to perform fast truncated singular value decomposition in whitening step. The default is FALSE.
 #' @param eps The convergence threshold. The default is 1e-6.
-#' @param maxit.laplace The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.
+#' @param maxit The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.
 #' @param verbose Whether print the information about convergence. The default is FALSE.
 #' @param col.stand Whether standardize the data matrix column-wise. Default if TRUE.
 #' @param row.stand Whether standardize the data matrix row-wise. Default if FALSE.
@@ -456,14 +460,13 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
 #' data(example_sim123)
 #'
 #' select_sparseICA = BIC_sparseICA(xData = xmat, n.comp = 3,U.list=NULL,
-#'     whiten = "eigenvec", orth.method="svd", method="C",
-#'     restarts.pbyd = 40, lambda = sqrt(2)/2,
-#'     eps = 1e-6,maxit.laplace = 500, BIC_plot = TRUE,verbose=FALSE,
+#'     whiten = "eigenvec", orth.method="svd", method="C", lambda = sqrt(2)/2,
+#'     eps = 1e-6,maxit = 500, BIC_plot = TRUE,verbose=FALSE,
 #'     nu_list = seq(0.1,4,0.1))
 #'
 #' my_nu = select_sparseICA$best_nu
 #' }
-BIC_sparseICA = function(xData,n.comp,nu_list = seq(0.1,4,0.1),U.list=NULL,whiten = c('eigenvec','sqrtprec','none'), orth.method=c('svd','givens'), method = c("C","R"),restarts.pbyd = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit.laplace = 500, verbose=FALSE,col.stand=TRUE, row.stand=FALSE, iter.stand=0, BIC_plot = FALSE){
+BIC_sparseICA = function(xData,n.comp,nu_list = seq(0.1,4,0.1),U.list=NULL,whiten = c('eigenvec','sqrtprec','lngca','none'), orth.method=c('svd','givens'), method = c("C","R"), lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit = 500, verbose=FALSE,col.stand=TRUE, row.stand=FALSE, iter.stand=0, BIC_plot = FALSE){
   start.time = Sys.time()
 
   ##############################################################################
@@ -476,9 +479,9 @@ BIC_sparseICA = function(xData,n.comp,nu_list = seq(0.1,4,0.1),U.list=NULL,white
   # reference Sparse ICA
   best_nu = 0.0000000001
   ref_sparseICA = sparseICA(xData = xData, n.comp = n.comp,whiten = whiten,orth.method=orth.method,
-                              method=method,restarts.pbyd = restarts.pbyd,irlba = irlba,
+                              method=method,restarts = 1,irlba = irlba,
                               lambda = lambda, nu = best_nu,eps = eps,
-                              maxit.laplace = maxit.laplace, verbose = verbose,
+                              maxit = maxit, verbose = verbose,
                               converge_plot = F,col.stand=col.stand, row.stand=row.stand, iter.stand=iter.stand)
 
   # center raw data matrix
@@ -498,8 +501,8 @@ BIC_sparseICA = function(xData,n.comp,nu_list = seq(0.1,4,0.1),U.list=NULL,white
     my_nu = nu_list[i]
     temp_sparseICA = sparseICA(xData = xData,n.comp = n.comp,U.list = my_W_list,
                                  whiten = whiten,orth.method=orth.method,method=method,
-                                 restarts.pbyd = restarts.pbyd, lambda = lambda,
-                                 nu = my_nu,eps = eps,maxit.laplace = maxit.laplace,
+                                 restarts = 1, lambda = lambda,
+                                 nu = my_nu,eps = eps,maxit = maxit,
                                verbose = verbose, converge_plot = F,
                                  col.stand=col.stand, row.stand=row.stand, iter.stand=iter.stand)
     S_nu = temp_sparseICA$estS
@@ -516,7 +519,7 @@ BIC_sparseICA = function(xData,n.comp,nu_list = seq(0.1,4,0.1),U.list=NULL,white
     out_BIC[i] = log(e_nu/(v*t))+sum(temp_sparseICA$estS!=0)*log(v*t)/(v*t)
   }
 
-  best_nu = nu_list[which(out_BIC==min(out_BIC))]
+  best_nu = nu_list[which(out_BIC==min(out_BIC))][1]
   if(verbose){
     cat("The best nu selected by BIC is ",best_nu,".\n")
   }

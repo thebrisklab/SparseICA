@@ -9,14 +9,14 @@ sparseICA(
   n.comp,
   nu = 1,
   U.list = NULL,
-  whiten = c("eigenvec", "sqrtprec", "none"),
+  whiten = c("eigenvec", "sqrtprec", "lngca", "none"),
   orth.method = c("svd", "givens"),
   method = c("C", "R"),
-  restarts.pbyd = 40,
+  restarts = 40,
   lambda = sqrt(2)/2,
   irlba = FALSE,
   eps = 1e-06,
-  maxit.laplace = 500,
+  maxit = 500,
   verbose = FALSE,
   converge_plot = FALSE,
   col.stand = TRUE,
@@ -33,13 +33,13 @@ sparseICA(
 
 \item{U.list}{The initialization of U matrix. Default is "NULL".}
 
-\item{whiten}{The method for whitening input xData. Could take "eigenvec", "sqrtprec", and "none". The default is "eigenvec".}
+\item{whiten}{The method for whitening input xData. Could take "eigenvec", "sqrtprec", "lngca", and "none". The default is "eigenvec".}
 
 \item{orth.method}{The method used for generating initial values of U matrix. The default is "svd".}
 
 \item{method}{If method == "C" (default) then C code is used to perform most of the computations, which makes the algorithm run faster. If method == "R" then computations are done exclusively in R.}
 
-\item{restarts.pbyd}{The number of initial points. Default is 40.}
+\item{restarts}{The number of initial points. Default is 40.}
 
 \item{lambda}{The scale parameter in Laplace density. The default is sqrt(2)/2 to make the default situation with unit variance.}
 
@@ -47,7 +47,7 @@ sparseICA(
 
 \item{eps}{The convergence threshold. The default is 1e-6.}
 
-\item{maxit.laplace}{The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.}
+\item{maxit}{The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.}
 
 \item{verbose}{Whether print the information about convergence. The default is FALSE.}
 
@@ -79,8 +79,8 @@ The function to perform Sparse ICA, which is implemented in both pure R and RCpp
 data(example_sim123)
 
 my_sparseICA = sparseICA(xData = xmat, n.comp = 3, nu = 1.2, U.list=NULL,
-    whiten = "eigenvec", orth.method = "svd", method="C",restarts.pbyd = 40,
-    lambda = sqrt(2)/2, eps = 1e-6, maxit.laplace = 500, verbose=TRUE)
+    whiten = "eigenvec", orth.method = "svd", method="C",restarts = 40,
+    lambda = sqrt(2)/2, eps = 1e-6, maxit = 500, verbose=TRUE)
 
 a=matchICA(my_sparseICA$estS,smat)
 
