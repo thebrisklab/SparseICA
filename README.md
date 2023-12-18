@@ -34,30 +34,27 @@ library(SparseICA)
 
 ## Tutorial
 
-The `sparseICA_R()` and `sparseICA_Rcpp()` are the main function of our Sparse ICA algorithm. `sparseICA_R()` is purely implemented in R, while `sparseICA_Rcpp()` is implemented in Rcpp.
-The `BIC_sparseICA_R()` and `BIC_sparseICA_Rcpp()` select the tuning parameter nu based on our proposed BIC-like criterion.     
+The `sparseICA()` is the main function of our Sparse ICA algorithm. It is implemented in both pure R and Rcpp.
+The `BIC_sparseICA()` selects the tuning parameter nu based on our proposed BIC-like criterion.     
 
 ### Explanation of Arguments  
 #### 1. sparseICA function
 ```
-sparseICA_R(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrtprec','none'), orth.method=c('svd','givens'), restarts.pbyd = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit.laplace = 500, show_message=TRUE, converge_plot = FALSE,col.stand=TRUE, row.stand=FALSE, iter.stand=0)
-```
-or
-```
-sparseICA_Rcpp(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrtprec','none'), orth.method=c('svd','givens'), restarts.pbyd = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit.laplace = 500, show_message=TRUE, converge_plot = FALSE,col.stand=TRUE, row.stand=FALSE, iter.stand=0)
+sparseICA(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrtprec','lngca','none'), orth.method=c('svd','givens'), method = c("C","R"), restarts = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit = 500, verbose=TRUE, converge_plot = FALSE,col.stand=TRUE, row.stand=FALSE, iter.stand=0)
 ```
 - `xData`: Input data matrix with dimension P x T. P is the number of features. t is the number of samples.
 - `n.comp`: The number of components.
 - `nu`: the tuning parameter controlling the accuracy and sparsity of the results. Should be selected by the BIC-like criterion "BIC_sparseICA_R()" or expert knowledge. The default is 1.
 - `U.list`: The initialization of U matrix. Default is "NULL".
-- `whiten`: The method for whitening input xData. Could take "eigenvec", "sqrtprec", and "none". The default is "eigenvec".
+- `whiten`: The method for whitening input xData. Could take "eigenvec", "sqrtprec", "lngca", and "none". The default is "eigenvec".
 - `orth.method`: The method used for generating initial values of U matrix. The default is "svd".
-- `restarts.pbyd`: The number of initial points. Default is 40.
+- `method` If method == "C" (default) then C code is used to perform most of the computations, which makes the algorithm run faster. If method == "R" then computations are done exclusively in R.
+- `restarts`: The number of initial points. Default is 40.
 - `lambda`: The scale parameter in Laplace density. The default is sqrt(2)/2 to make the default situation with unit variance.
 - `irlba`: Whether use the irlba method to perform fast truncated singular value decomposition in whitening step. The default is FALSE.
 - `eps`: The convergence threshold. The default is 1e-6.
-- `maxit.laplace`: The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.
-- `show_message`: Whether print the information about convergence. The default is TRUE.
+- `maxit`: The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.
+- `verbose`: Whether print the information about convergence. The default is FALSE.
 - `converge_plot`: Whether make a convergence plot for Sparse ICA method. The default is FALSE.
 - `col.stand`: Whether standardize the data matrix column-wise. Default if TRUE.
 - `row.stand`: Whether standardize the data matrix row-wise. Default if FALSE.
@@ -65,24 +62,20 @@ sparseICA_Rcpp(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrtprec',
 
 #### 2. BIC_sparseICA function
 ```
-BIC_sparseICA_R(xData,n.comp,nu_list = seq(0.1,4,0.1),U.list=NULL,whiten = c('eigenvec','sqrtprec','none'), orth.method=c('svd','givens'), restarts.pbyd = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit.laplace = 500, show_message=TRUE,col.stand=TRUE, row.stand=FALSE, iter.stand=0, BIC_plot = FALSE)
-```
-or
-```
-BIC_sparseICA_Rcpp(xData,n.comp,nu_list = seq(0.1,4,0.1),U.list=NULL,whiten = c('eigenvec','sqrtprec','none'), orth.method=c('svd','givens'), restarts.pbyd = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit.laplace = 500, show_message=TRUE,col.stand=TRUE, row.stand=FALSE, iter.stand=0, BIC_plot = FALSE)
+BIC_sparseICA(xData,n.comp,nu_list = seq(0.1,4,0.1),U.list=NULL,whiten = c('eigenvec','sqrtprec','lngca,'none'), orth.method=c('svd','givens'), method = c("C","R"), restarts = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit = 500, verbose=TRUE,col.stand=TRUE, row.stand=FALSE, iter.stand=0, BIC_plot = FALSE)
 ```
 - `xData` Input data matrix with dimension P x T. P is the number of features. t is the number of samples.
 - `n.comp` The number of components.
 - `nu_list` the list of candidate tuning parameter. Default is seq(0.1,4,0.1).
 - `U.list` The initialization of U matrix. Default is "NULL".
-- `whiten` The method for whitening input xData. Could take "eigenvec", "sqrtprec", and "none". The default is "eigenvec".
+- `whiten` The method for whitening input xData. Could take "eigenvec", "sqrtprec", 'lngca', and "none". The default is "eigenvec".
 - `orth.method` The method used for generating initial values of U matrix. The default is "svd".
-- `restarts.pbyd` The number of initial points. Default is 40.
+- `method` If method == "C" (default) then C code is used to perform most of the computations, which makes the algorithm run faster. If method == "R" then computations are done exclusively in R.
 - `lambda` The scale parameter in Laplace density. The default is sqrt(2)/2 to make the default situation with unit variance.
 - `irlba` Whether use the irlba method to perform fast truncated singular value decomposition in whitening step. The default is FALSE.
 - `eps` The convergence threshold. The default is 1e-6.
-- `maxit.laplace` The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.
-- `show_message` Whether print the information about convergence. The default is TRUE.
+- `maxit` The maximum number of iterations in the Sparse ICA method with Laplace density. The default number is 500.
+- `verbose` Whether print the information about convergence. The default is FALSE.
 - `col.stand` Whether standardize the data matrix column-wise. Default if TRUE.
 - `row.stand` Whether standardize the data matrix row-wise. Default if FALSE.
 - `iter.stand` The number of standardization. Default is 0.
@@ -146,17 +139,9 @@ par(mfrow=c(1,1))
 ### 2. Tuning parameter selection
 - Select the best tuning parameter `nu` using `BIC_sparseICA` function.
 ```r
-select_sparseICA = BIC_sparseICA_R(xData = xmat, n.comp = 3,U.list=NULL,
-                                   whiten = "eigenvec", restarts.pbyd = 40, lambda = sqrt(2)/2,
-                                   eps = 1e-6,maxit.laplace = 500, BIC_plot = TRUE,show_message=FALSE,
-                                   nu_list = seq(0.1,4,0.1))
-my_nu = select_sparseICA$best_nu
-```
-or 
-```r
-select_sparseICA = BIC_sparseICA_Rcpp(xData = xmat, n.comp = 3,U.list=NULL,
-                                   whiten = "eigenvec", restarts.pbyd = 40, lambda = sqrt(2)/2,
-                                   eps = 1e-6,maxit.laplace = 500, BIC_plot = TRUE,show_message=FALSE,
+select_sparseICA = BIC_sparseICA(xData = xmat, n.comp = 3, U.list = NULL,
+                                   whiten = "eigenvec", method = "C", lambda = sqrt(2)/2,
+                                   eps = 1e-6,maxit = 500, BIC_plot = TRUE,verbose=FALSE,
                                    nu_list = seq(0.1,4,0.1))
 my_nu = select_sparseICA$best_nu
 ```
@@ -168,16 +153,11 @@ The best `nu` is 1.2.
 ### 3. Run Sparse ICA
 - Perform our Sparse ICA algorithm based on the selected `nu` using `sparseICA` function.
 ```r
-my_sparseICA = sparseICA_R(xData = xmat, n.comp = 3, nu = my_nu, U.list=NULL,
-                           whiten = "eigenvec", orth.method = "svd", restarts.pbyd = 40,
-                           lambda = sqrt(2)/2, eps = 1e-6, maxit.laplace = 500, show_message=TRUE)
+my_sparseICA = sparseICA(xData = xmat, n.comp = 3, nu = my_nu, U.list = NULL,
+                           whiten = "eigenvec", orth.method = "svd", method = "C",restarts = 40,
+                           lambda = sqrt(2)/2, eps = 1e-6, maxit = 500, verbose=TRUE)
 ```
-or 
-```r
-my_sparseICA = sparseICA_Rcpp(xData = xmat, n.comp = 3, nu = my_nu, U.list=NULL,
-                           whiten = "eigenvec", orth.method = "svd", restarts.pbyd = 40,
-                           lambda = sqrt(2)/2, eps = 1e-6, maxit.laplace = 500, show_message=TRUE)
-```
+
 ### 4. Visualization of Sparse ICA results
 - Match estimates with the truth.
 ```r
