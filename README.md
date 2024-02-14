@@ -1,6 +1,9 @@
 SparseICA: Sparse Independent Component Analysis <img src="fig/sticker.png" width="120" align="right" />
 ===================================================
 
+<br>
+<br>
+
 Sparse ICA (Sparse Independent Component Analysis) is a novel ICA method that enables sparse estimation of independent source components.
 
 ## Installation
