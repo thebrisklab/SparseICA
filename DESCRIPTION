@@ -9,7 +9,7 @@ Description: A novel Sparse ICA method that enables sparse estimation of indepen
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 LinkingTo: 
     Rcpp,
     RcppArmadillo

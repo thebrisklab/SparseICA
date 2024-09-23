@@ -21,11 +21,12 @@ sparseICA(
   converge_plot = FALSE,
   col.stand = TRUE,
   row.stand = FALSE,
-  iter.stand = 0
+  iter.stand = 0,
+  positive_skewness = TRUE
 )
 }
 \arguments{
-\item{xData}{Input data matrix with dimension P x T. P is the number of features. t is the number of samples.}
+\item{xData}{Input data matrix with dimension P x T. P is the number of features. T is the number of samples.}
 
 \item{n.comp}{The number of components.}
 
@@ -58,6 +59,8 @@ sparseICA(
 \item{row.stand}{Whether standardize the data matrix row-wise. Default if FALSE.}
 
 \item{iter.stand}{The number of standardization. Default is 0.}
+
+\item{positive_skewness}{Whether to make the estimated components have positive skewness. Default is TRUE.}
 }
 \value{
 Function outputs a list including the following:
