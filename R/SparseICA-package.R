@@ -146,7 +146,7 @@ soft_thresh_R = function(x, nu = 1, lambda = sqrt(2)/2) {
 #'
 #' The function to perform Sparse ICA, which is implemented in both pure R and RCpp.
 #'
-#' @param xData Input data matrix with dimension P x T. P is the number of features. t is the number of samples.
+#' @param xData Input data matrix with dimension P x T. P is the number of features. T is the number of samples.
 #' @param n.comp The number of components.
 #' @param nu the tuning parameter controlling the accuracy and sparsity of the results. Should be selected by the BIC-like criterion "BIC_sparseICA_R()" or expert knowledge. The default is 1.
 #' @param U.list The initialization of U matrix. Default is "NULL".
@@ -163,6 +163,7 @@ soft_thresh_R = function(x, nu = 1, lambda = sqrt(2)/2) {
 #' @param col.stand Whether standardize the data matrix column-wise. Default if TRUE.
 #' @param row.stand Whether standardize the data matrix row-wise. Default if FALSE.
 #' @param iter.stand The number of standardization. Default is 0.
+#' @param positive_skewness Whether to make the estimated components have positive skewness. Default is TRUE.
 #'
 #' @return Function outputs a list including the following:
 #' \describe{
@@ -197,7 +198,7 @@ soft_thresh_R = function(x, nu = 1, lambda = sqrt(2)/2) {
 #' image(matrix(a[,3],33,33))
 #' par(mfrow=c(1,1))
 #' }
-sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrtprec','lngca','none'),orth.method=c('svd','givens'), method = c("C","R"),restarts = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit = 500, verbose=FALSE, converge_plot = FALSE,col.stand=TRUE, row.stand=FALSE, iter.stand=0){
+sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrtprec','lngca','none'),orth.method=c('svd','givens'), method = c("C","R"),restarts = 40, lambda = sqrt(2)/2, irlba = FALSE, eps = 1e-06, maxit = 500, verbose=FALSE, converge_plot = FALSE,col.stand=TRUE, row.stand=FALSE, iter.stand=0,positive_skewness=TRUE){
 
   start.time = Sys.time()
 
@@ -341,6 +342,11 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
   final.out.list$whitener = whitener
   final.out.list$loglik_restarts = loglik
   final.out.list$estM = est.M.ols(final.out.list$estS,xData_centered)
+  if(positive_skewness){
+    temp <- signchange(t(final.out.list$estS),t(final.out.list$estM))
+    final.out.list$estS <- t(temp$S)
+    final.out.list$estM <- t(temp$M)
+  }
   #out.list$estM = solve(out.list$estW) %*% ginv(out.list$whitener)
 
   if (converge_plot) {
@@ -402,6 +408,11 @@ sparseICA = function(xData,n.comp,nu = 1,U.list=NULL,whiten = c('eigenvec','sqrt
     out.list$distribution = "Laplace"
     out.list$whitener = whitener
     out.list$estM = est.M.ols(out.list$estS,xData_centered)
+    if(positive_skewness){
+      temp <- signchange(t(out.list$estS),t(out.list$estM))
+      out.list$estS <- t(temp$S)
+      out.list$estM <- t(temp$M)
+    }
 
     if (converge_plot) {
       plot(out.list$converge[which(out.list$converge!=0)], main = "Convergence Plot", xlab = "Iteration", ylab = "Norm Difference", type = "o")
@@ -589,3 +600,5 @@ matchICA=function(S,template,M=NULL) {
     t(s.perm)
   }
 }
+
+
