@@ -206,6 +206,7 @@ par(mfrow=c(1,1))
 ```
 
 ## Citation
+
 Those using the **SparseICA** software should cite:    
 [Wang Z., Gaynanova, I., Aravkin, A., Risk, B. B. (2024). Sparse Independent Component Analysis with an Application to Cortical Surface fMRI Data in Autism. Journal of the American Statistical Association, 1–13.](https://doi.org/10.1080/01621459.2024.2370593)
 
