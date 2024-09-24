@@ -100,6 +100,7 @@ theta2W = function(theta){
 #' @param center.row Whether center the row of data
 #' @param irlba Whether use the irlba package
 #' @return a whitener matrix
+#' @export
 #'
 #' @import MASS
 #' @import irlba
