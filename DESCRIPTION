@@ -1,7 +1,7 @@
 Package: SparseICA
 Type: Package
 Title: Sparse Independent Component Analysis
-Version: 0.1.1
+Version: 0.1.2
 Date: 2024-09-23
 Author: Zihang Wang, Irina Gaynanova, Aleksandr Aravkin, Benjamin B. Risk
 Maintainer: Zihang Wang <zihang.wang@emory.edu>
