@@ -100,10 +100,10 @@ theta2W = function(theta){
 #' @param center.row Whether center the row of data
 #' @param irlba Whether use the irlba package
 #' @return a whitener matrix
-#' @export
 #'
 #' @import MASS
 #' @import irlba
+#' @export
 whitener <- function(X,n.comp=ncol(X),center.row=FALSE,irlba=FALSE) {
   #X must be n x d
   if(ncol(X)>nrow(X)) warning('X is whitened with respect to columns')
