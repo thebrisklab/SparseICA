@@ -54,23 +54,23 @@ sparseICA(
 - `xData`: A numeric matrix of input data with dimensions P x T, where P is the number of features and T is the number of samples.
 - `n.comp`: An integer specifying the number of components to estimate.
 - `nu`: A positive numeric value or a character "BIC" specifying the tuning parameter controlling the balance between accuracy and sparsity of the results. It can be selected using a BIC-like criterion (\code{"BIC"}) or based on expert knowledge (a positive number). Default is "BIC".
-- `nu_list`: A numeric vector specifying the list of candidate tuning parameters. Default is \code{seq(0.1, 4, 0.1)}.
-- `U.list`: An optional matrix specifying the initialization of the U matrix. Default is \code{NULL}.
-- `whiten`: A character string specifying the method for whitening the input \code{xData}. Options are \code{"eigenvec"}, \code{"sqrtprec"}, \code{"lngca"}, or \code{"none"}. Default is \code{"eigenvec"}.
-- `lngca`: A logical value indicating whether to perform Linear Non-Gaussian Component Analysis (LNGCA). Default is \code{FALSE}.
-- `orth.method`: A character string specifying the method used for generating initial values for the U matrix. Default is \code{"svd"}.
-- `method`: A character string specifying the computation method. If \code{"C"} (default), C code is used for most computations for better performance. If \code{"R"}, computations are performed entirely in R.
+- `nu_list`: A numeric vector specifying the list of candidate tuning parameters. Default is `seq(0.1, 4, 0.1)`.
+- `U.list`: An optional matrix specifying the initialization of the U matrix. Default is `NULL`.
+- `whiten`: A character string specifying the method for whitening the input `xData`. Options are `eigenvec`, `sqrtprec`, `lngca`, or `none`. Default is `eigenvec`.
+- `lngca`: A logical value indicating whether to perform Linear Non-Gaussian Component Analysis (LNGCA). Default is `FALSE`.
+- `orth.method`: A character string specifying the method used for generating initial values for the U matrix. Default is `svd`.
+- `method`: A character string specifying the computation method. If `C` (default), C code is used for most computations for better performance. If `R`, computations are performed entirely in R.
 - `restarts`: An integer specifying the number of random initializations for optimization. Default is 40.
-- `use_irlba`: A logical value indicating whether to use the \code{irlba} method for fast truncated Singular Value Decomposition (SVD) during whitening. This can improve memory efficiency for intermediate datasets. Default is \code{TRUE}.
-- `eps`: A numeric value specifying the convergence threshold. Default is \code{1e-6}.
+- `use_irlba`: A logical value indicating whether to use the `irlba` method for fast truncated Singular Value Decomposition (SVD) during whitening. This can improve memory efficiency for intermediate datasets. Default is `TRUE`.
+- `eps`: A numeric value specifying the convergence threshold. Default is `1e-6`.
 - `maxit`: An integer specifying the maximum number of iterations for the Sparse ICA method using Laplace density. Default is 500.
-- `verbose`: A logical value indicating whether to print convergence information during execution. Default is \code{TRUE}.
-- `BIC_verbose`: A logical value indicating whether to print BIC selection information. Default is \code{FALSE}.
-- `converge_plot`: A logical value indicating whether to generate a line plot showing the convergence trace. Default is \code{FALSE}.
-- `col.stand`: A logical value indicating whether to standardize columns. For each column, the mean of the entries in the column equals 0, and the variance of the entries in the column equals 1. Default is \code{TRUE}.
-- `row.stand`: A logical value indicating whether to standardize rows. For each row, the mean of the entries in the row equals 0, and the variance of the entries in the row equals 1. Default is \code{FALSE}.
-- `iter.stand`: An integer specifying the number of iterations for achieving both row and column standardization when \code{col.stand = TRUE} and \code{row.stand = TRUE}. Default is 5.
-- `positive_skewness`: A logical value indicating whether to enforce positive skewness on the estimated components. Default is \code{TRUE}.
+- `verbose`: A logical value indicating whether to print convergence information during execution. Default is `TRUE`.
+- `BIC_verbose`: A logical value indicating whether to print BIC selection information. Default is `FALSE`.
+- `converge_plot`: A logical value indicating whether to generate a line plot showing the convergence trace. Default is `FALSE`.
+- `col.stand`: A logical value indicating whether to standardize columns. For each column, the mean of the entries in the column equals 0, and the variance of the entries in the column equals 1. Default is `TRUE`.
+- `row.stand`: A logical value indicating whether to standardize rows. For each row, the mean of the entries in the row equals 0, and the variance of the entries in the row equals 1. Default is `FALSE`.
+- `iter.stand`: An integer specifying the number of iterations for achieving both row and column standardization when `col.stand = TRUE` and `row.stand = TRUE`. Default is 5.
+- `positive_skewness`: A logical value indicating whether to enforce positive skewness on the estimated components. Default is `TRUE`.
 
 ### Explanation of Output
 The output will be a list with the following components as such:
