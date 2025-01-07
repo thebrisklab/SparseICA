@@ -1,23 +1,23 @@
 Package: SparseICA
 Type: Package
 Title: Sparse Independent Component Analysis
-Version: 0.1.2
-Date: 2024-09-23
-Author: Zihang Wang, Irina Gaynanova, Aleksandr Aravkin, Benjamin B. Risk
-Maintainer: Zihang Wang <zihang.wang@emory.edu>
-Description: A novel Sparse ICA method that enables sparse estimation of independent source components by solving a non-smooth non-convex optimization problem via the relax-and-split framework. The Sparse ICA balances statistical independence and sparsity simultaneously and is computationally fast.
+Version: 0.1.3
+Date: 2025-01-05
+Author: Zihang Wang
+Maintainer: Zihang Wang <zhwang0378@gmail.com>
+Description: Provides an implementation of the Sparse ICA method for estimating sparse independent source components of cortical surface functional MRI data, by addressing a non-smooth, non-convex optimization problem through the relax-and-split framework. This method effectively balances statistical independence and sparsity while maintaining computational efficiency.
 License: GPL (>= 3)
-Encoding: UTF-8
-LazyData: true
+LinkingTo: Rcpp, RcppArmadillo
+Roxygen: list()
 RoxygenNote: 7.3.1
-LinkingTo: 
-    Rcpp,
-    RcppArmadillo
-Imports: 
-    Rcpp (>= 1.0.9),
-    MASS (>= 7.3-58.1),
-    RcppArmadillo (>= 0.12.0.0.0),
-    irlba (>= 2.3.5),
-    clue (>= 0.3)
+Encoding: UTF-8
+Imports:
+    RcppArmadillo (>= 14.2.2-1),
+    Rcpp (>= 1.0.13-1),
+    MASS (>= 7.3-60.2),
+    irlba (>= 2.3.5.1),
+    clue (>= 0.3-65),
+    ciftiTools (>= 0.16.1)
 Depends: 
     R (>= 4.1.0)
+LazyData: true
