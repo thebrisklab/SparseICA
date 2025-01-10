@@ -53,7 +53,7 @@ sparseICA(
 ```
 - `xData`: A numeric matrix of input data with dimensions P x T, where P is the number of features and T is the number of samples.
 - `n.comp`: An integer specifying the number of components to estimate.
-- `nu`: A positive numeric value or a character "BIC" specifying the tuning parameter controlling the balance between accuracy and sparsity of the results. It can be selected using a BIC-like criterion (\code{"BIC"}) or based on expert knowledge (a positive number). Default is "BIC".
+- `nu`: A positive numeric value or a character `"BIC"` specifying the tuning parameter controlling the balance between accuracy and sparsity of the results. It can be selected using a BIC-like criterion (`"BIC"`) or based on expert knowledge (a positive number). Default is "BIC".
 - `nu_list`: A numeric vector specifying the list of candidate tuning parameters. Default is `seq(0.1, 4, 0.1)`.
 - `U.list`: An optional matrix specifying the initialization of the U matrix. Default is `NULL`.
 - `whiten`: A character string specifying the method for whitening the input `xData`. Options are `eigenvec`, `sqrtprec`, `lngca`, or `none`. Default is `eigenvec`.
