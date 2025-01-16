@@ -56,6 +56,7 @@ create_group_list <- function(bids_path,pattern = "task-rest.*\\.dtseries\\.nii$
 #' @param bids_path A character string specifying the root directory of the BIDS-formatted dataset. 
 #' @param subj_list A named list generated from \code{create_group_list} containing fMRI file paths for each subject. 
 #' @param n.comp An integer specifying the number of components to retain during group-level PCA. Default is 30.
+#' @param ncore An integer specifying the number of cores to use for parallel processing. Default is 1.
 #' @param npc An integer specifying the number of components to retain during subject-level PCA. Default is 85.
 #' @param iter_std An integer specifying the number of iterative standardization steps to apply to fMRI data. Default is 5.
 #' @param brainstructures A character vector specifying the brain structures to include in the analysis. Options are \code{"left"} (left cortex), \code{"right"} (right cortex), and/or \code{"subcortical"} (subcortex and cerebellum). Can also be \code{"all"} (obtain all three brain structures). Default is \code{c("left", "right")}.
@@ -76,26 +77,24 @@ create_group_list <- function(bids_path,pattern = "task-rest.*\\.dtseries\\.nii$
 #'
 #' @import ciftiTools
 #' @import irlba
+#' @import parallel
 #' @export
-
-gen_groupPC <- function(bids_path,subj_list,n.comp = 30,
-                        npc = 85,iter_std = 5,brainstructures = c("left","right")){
+gen_groupPC <- function(bids_path, subj_list, n.comp = 30, ncore=1,
+                        npc = 85, iter_std = 5, brainstructures = c("left", "right")) {
   
-  cat("# Start generating group PC of",length(subj_list),"subjects. #\n")
+  cat("# Start generating group PC of", length(subj_list), "subjects. #\n")
   
-  groupPC <- c()
-  
-  for (i in 1:length(subj_list)) {
-    nfile <- length(subj_list[[names(subj_list)[i]]])
-    cat("##",names(subj_list)[i],"has",nfile,"cortical surface fMRI data. ##\n")
+  process_subject <- function(subject_name, subject_files) {
+    nfile <- length(subject_files)
+    cat("##", subject_name, "has", nfile, "cortical surface fMRI data. ##\n")
     
     dat <- c()
     for (j in 1:nfile) {
-      xii <- read_cifti(cifti_fname = paste0(bids_path,"/",names(subj_list)[i],"/",subj_list[[names(subj_list)[i]]][j]),
+      xii <- read_cifti(cifti_fname = paste0(bids_path, "/", subject_name, "/", subject_files[j]),
                         brainstructures = brainstructures)
       xii_mat <- as.matrix(xii)
       
-      # iterative standardization
+      # Iterative standardization
       for (k in 1:iter_std) {
         # Standardize across time
         xii_mat <- apply(xii_mat, 2, function(col) {
@@ -106,28 +105,34 @@ gen_groupPC <- function(bids_path,subj_list,n.comp = 30,
           (row - mean(row)) / sd(row)
         }))
       }
-      dat <- cbind(dat,xii_mat)
+      dat <- cbind(dat, xii_mat)
     }
-    cat("## Total number of TRs:",dim(dat)[2],".##\n")
+    cat("## Total number of TRs:", dim(dat)[2], ".##\n")
     
-    # perform PCA
-    subj_PCA=irlba::prcomp_irlba(dat,npc)
-    PC_subj=subj_PCA$x
-    dimnames(PC_subj)=NULL
+    # Perform PCA
+    subj_PCA <- prcomp_irlba(dat, npc)
+    PC_subj <- subj_PCA$x
+    dimnames(PC_subj) <- NULL
     
-    cat("## Retained",npc,"PCs. ##\n")
-    
-    groupPC <- cbind(groupPC,PC_subj)
+    cat("## Retained", npc, "PCs. ##\n")
+    return(PC_subj)
   }
   
-  cat("# Finish subject-levl PCA! The concatenated matrix has dimension",dim(groupPC),". #\n")
+  # Parallel processing of subjects
+  #cores <- detectCores() - 1  # Reserve one core for the system
+  groupPC_list <- mclapply(names(subj_list), function(subject_name) {
+    process_subject(subject_name, subj_list[[subject_name]])
+  }, mc.cores = ncore)
   
-  # perform group PCA
-  temp = whitener(X = groupPC ,n.comp = n.comp,use_irlba = TRUE)
-  groupPC = temp$Z
+  # Combine all subject PCs
+  groupPC <- do.call(cbind, groupPC_list)
+  cat("# Finish subject-level PCA! The concatenated matrix has dimension", dim(groupPC), ". #\n")
+  
+  # Perform group PCA
+  temp <- whitener(X = groupPC, n.comp = n.comp, use_irlba = TRUE)
+  groupPC <- temp$Z
   
   cat("# Finish group PCA. #\n")
-  
   return(groupPC)
 }
 
@@ -140,6 +145,7 @@ gen_groupPC <- function(bids_path,subj_list,n.comp = 30,
 #' @param subj_list A named list where each element corresponds to a subject and contains vectors of fMRI file names. If \code{NULL}, the subject list is generated automatically using \code{\link{create_group_list}}. Default is \code{NULL}.
 #' @param nu A numeric value for the tuning parameter, or \code{"BIC"} to select \code{nu} using a BIC-like criterion. Default is \code{"BIC"}.
 #' @param n.comp An integer specifying the number of components to estimate. Default is 30.
+#' @param ncore An integer specifying the number of cores to use for parallel processing. Default is 1.
 #' @param method A character string specifying the computation method for Sparse ICA. Options are \code{"C"} (default) for C-based computation or \code{"R"} for R-based computation.
 #' @param npc An integer specifying the number of components to retain during subject-level PCA. Default is 85.
 #' @param iter_std An integer specifying the number of iterative standardization steps to apply to fMRI data. Default is 5.
@@ -185,7 +191,7 @@ gen_groupPC <- function(bids_path,subj_list,n.comp = 30,
 #' @seealso \code{\link{create_group_list}}, \code{\link{gen_groupPC}}, \code{\link{BIC_sparseICA}}, \code{\link{sparseICA}}
 #' @export
 group_sparseICA <- function(bids_path, subj_list = NULL, nu = "BIC",
-                            n.comp = 30, method = "C",
+                            n.comp = 30, method = "C", ncore = 1,
                             npc = 85, iter_std = 5, brainstructures = c("left","right"),
                             restarts = 40, positive_skewness = TRUE,use_irlba = TRUE,
                             eps = 1e-6, maxit = 500, BIC_plot = TRUE, nu_list = seq(0.1,4,0.05),
@@ -215,6 +221,7 @@ group_sparseICA <- function(bids_path, subj_list = NULL, nu = "BIC",
   
   PC_group <- gen_groupPC(bids_path=bids_path,
                           subj_list = subj_list,
+                          ncore = ncore,
                           n.comp = n.comp,
                           npc = npc,iter_std = iter_std,brainstructures = brainstructures)
   

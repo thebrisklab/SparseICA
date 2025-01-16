@@ -2,8 +2,7 @@ bibentry(
   bibtype  = "Article",
   title    = "Sparse Independent Component Analysis with an Application to Cortical Surface fMRI Data in Autism",
   author   = c(person(given = c("Zihang"),
-                          family = "Wang",
-                          email = "zihang.wang@emory.edu"),
+                          family = "Wang"),
                    person(given = "Irina",
                           family = "Gaynanova"),
                    person(given = "Aleksandr",
@@ -12,6 +11,8 @@ bibentry(
                           family = "Risk")),
   journal  = "Journal of the American Statistical Association",
   year     = "2024",
-  pages    = "1--13",
+  volume   = "119",
+  number   = "548",
+  pages    = "2508-2520",
   doi      = "10.1080/01621459.2024.2370593"
 )
