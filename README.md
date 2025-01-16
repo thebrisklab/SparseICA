@@ -17,6 +17,7 @@ The following R packages are required:
 - irlba (>= 2.3.5.1)
 - clue (>= 0.3-65)
 - ciftiTools (>= 0.16.1)
+- parallel (>= 4.4.0)
 - devtools
 
 You can install them by running this code:
