@@ -11,13 +11,13 @@ We assume you are running R 4.1.0 or newer. There is no guarantee for backward o
 
 The following R packages are required:
 
-- RcppArmadillo (>= 14.2.2-1)
-- Rcpp (>= 1.0.13-1)
-- MASS (>= 7.3-60.2)
-- irlba (>= 2.3.5.1)
-- clue (>= 0.3-65)
-- ciftiTools (>= 0.16.1)
-- parallel (>= 4.4.0)
+- RcppArmadillo (>= 14.2.2),
+- Rcpp (>= 1.0.13),
+- MASS (>= 7.3-58),
+- irlba (>= 2.3.5),
+- clue (>= 0.3),
+- ciftiTools (>= 0.16),
+- parallel (>= 4.4.0),
 - devtools
 
 You can install them by running this code:
