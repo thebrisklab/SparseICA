@@ -27,7 +27,7 @@ Imports:
     irlba (>= 2.3.5),
     clue (>= 0.3),
     ciftiTools (>= 0.16),
-    parallel (>= 4.4.0)
+    parallel (>= 4.1)
 Depends: 
     R (>= 4.1.0)
 LazyData: true
