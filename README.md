@@ -130,47 +130,47 @@ my_sparseICA = sparseICA(xData = example_sim123$xmat, n.comp = 3, nu = "BIC", me
 
 <img src="fig/BIC.png" width="1200" />
 
-The selected optimal `nu` is 1.2.
+The selected optimal `nu` is 1.1.
 
 ### 3. Visualization of Sparse ICA results
 - Match the order of the estimated components with the truth.
 ```r
-matched_res=matchICA(my_sparseICA$estS,smat,example_sim123$smat)
+matched_res=matchICA(my_sparseICA$estS,example_sim123$smat,my_sparseICA$estM)
 ```
 
 - Check the estimated source signals.
 ```r
 par(mfrow=c(1,3))
-image(matrix(-matched_res$estS[,1],33,33))
-image(matrix(-matched_res$estS[,2],33,33))
-image(matrix(-matched_res$estS[,3],33,33))
+image(matrix(-matched_res$S[,1],33,33))
+image(matrix(-matched_res$S[,2],33,33))
+image(matrix(-matched_res$S[,3],33,33))
 ```
 <img src="fig/estS.png" width="1200" />
 
 - Check the estimated time series in the mixing matrix.
 ```r
 par(mfrow=c(3,1))
-plot(matched_res$estM[1,],type = "l",xlab = "Time",ylab = "")
-plot(matched_res$estM[2,],type = "l",xlab = "Time",ylab = "")
-plot(matched_res$estM[3,],type = "l",xlab = "Time",ylab = "")
+plot(matched_res$M[1,],type = "l",xlab = "Time",ylab = "")
+plot(matched_res$M[2,],type = "l",xlab = "Time",ylab = "")
+plot(matched_res$M[3,],type = "l",xlab = "Time",ylab = "")
 ```
 <img src="fig/estM.png" width="1200" />
 
 - Check the correlations.
 ```r
-> cor(smat[,1],matched_res$estS[,1])
-[1] 0.9974975
-> cor(smat[,2],matched_res$estS[,2])
-[1] 0.9975088
-> cor(smat[,3],matched_res$estS[,3])
-[1] 0.9900951
+> cor(example_sim123$smat[,1],matched_res$S[,1])
+[1] 0.9970362
+> cor(example_sim123$smat[,2],matched_res$S[,2])
+[1] 0.9962684
+> cor(example_sim123$smat[,3],matched_res$S[,3])
+[1] 0.9856885
 
-> cor(mmat[1,],matched_res$estM[1,])
-[1] 0.9645858
-> cor(mmat[2,],matched_res$estM[2,])
-[1] 0.99116
-> cor(mmat[3,],matched_res$estM[3,])
-[1] 0.9924354
+> cor(example_sim123$mmat[1,],matched_res$M[1,])
+[1] 0.964416
+> cor(example_sim123$mmat[2,],matched_res$M[2,])
+[1] 0.9910054
+> cor(example_sim123$mmat[3,],matched_res$M[3,])
+[1] 0.9922269
 ```
 
 ## Citation
