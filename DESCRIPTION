@@ -21,12 +21,12 @@ LinkingTo: Rcpp, RcppArmadillo
 RoxygenNote: 7.3.1
 Encoding: UTF-8
 Imports:
-    RcppArmadillo (>= 14.2.2-1),
-    Rcpp (>= 1.0.13-1),
-    MASS (>= 7.3-60.2),
-    irlba (>= 2.3.5.1),
-    clue (>= 0.3-65),
-    ciftiTools (>= 0.16.1),
+    RcppArmadillo (>= 14.2.2),
+    Rcpp (>= 1.0.13),
+    MASS (>= 7.3-58),
+    irlba (>= 2.3.5),
+    clue (>= 0.3),
+    ciftiTools (>= 0.16),
     parallel (>= 4.4.0)
 Depends: 
     R (>= 4.1.0)
