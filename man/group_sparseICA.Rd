@@ -10,6 +10,7 @@ group_sparseICA(
   nu = "BIC",
   n.comp = 30,
   method = "C",
+  ncore = 1,
   npc = 85,
   iter_std = 5,
   brainstructures = c("left", "right"),
@@ -35,6 +36,8 @@ group_sparseICA(
 \item{n.comp}{An integer specifying the number of components to estimate. Default is 30.}
 
 \item{method}{A character string specifying the computation method for Sparse ICA. Options are \code{"C"} (default) for C-based computation or \code{"R"} for R-based computation.}
+
+\item{ncore}{An integer specifying the number of cores to use for parallel processing. Default is 1.}
 
 \item{npc}{An integer specifying the number of components to retain during subject-level PCA. Default is 85.}
 
