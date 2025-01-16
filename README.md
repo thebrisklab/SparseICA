@@ -23,8 +23,8 @@ The following R packages are required:
 You can install them by running this code:
 
 ```r
-if(!require(c("Rcpp","RcppArmadillo","MASS","irlba","clue","ciftiTools","devtools"))){
-    install.packages(c("Rcpp","RcppArmadillo","MASS","irlba","clue","ciftiTools","devtools"))
+if(!require(c("Rcpp","RcppArmadillo","MASS","irlba","clue","ciftiTools","parallel","devtools"))){
+    install.packages(c("Rcpp","RcppArmadillo","MASS","irlba","clue","ciftiTools","parallel","devtools"))
 }
 ```
 
