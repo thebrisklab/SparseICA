@@ -90,13 +90,6 @@ The function operates in four main steps:
   \item Executes Sparse ICA on the group-level PCs to estimate independent components.
 }
 }
-\examples{
-# Example usage:
-# Assuming `bids_dir` is the path to a BIDS dataset:
-# result <- group_sparseICA(bids_path = bids_dir, n.comp = 30, nu = "BIC")
-# str(result)
-
-}
 \seealso{
 \code{\link{create_group_list}}, \code{\link{gen_groupPC}}, \code{\link{BIC_sparseICA}}, \code{\link{sparseICA}}
 }
