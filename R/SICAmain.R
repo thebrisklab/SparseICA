@@ -122,7 +122,7 @@ relax_and_split_ICA <- function(
   orth.method <- match.arg(orth.method)
   method <- match.arg(method)
   
-  if (verbose) cat("Centering/scaling data.\n")
+  if (verbose) message("Centering/scaling data.")
   
   xData_centered = scale(xData, center=TRUE, scale=FALSE)
   # Center and optionally scale data
@@ -141,7 +141,7 @@ relax_and_split_ICA <- function(
   if (d > p) stop("Number of components (n.comp) must not exceed number of columns in data.")
   
   # Whitening
-  if (verbose) cat("Whitening data.\n")
+  if (verbose) message("Whitening data.")
   whitener <- diag(d) # Default to identity
   
   if (lngca) {
@@ -164,7 +164,7 @@ relax_and_split_ICA <- function(
   }
   runs <- length(U.list)
   
-  if (verbose) cat("Starting Sparse ICA with", runs, "initializations.\n")
+  if (verbose) message("Starting Sparse ICA with ",runs," initialization(s).")
   
   ##############################################################################
   ############################ R implementation ################################
@@ -222,7 +222,7 @@ relax_and_split_ICA <- function(
     
     if(verbose){
       for (converge_i in 1:length(final_out_list$converge)) {
-        cat("Iteration ",converge_i,", tol=",final_out_list$converge[converge_i],".\n")}
+        message("Iteration ",converge_i,", tol = ",final_out_list$converge[converge_i],".")}
       }
     
     if (converge_plot) {
@@ -238,7 +238,7 @@ relax_and_split_ICA <- function(
     if(verbose){
       converge = final_Rcpp$converge[final_Rcpp$converge!=0]
       for (converge_i in 1:length(converge)) {
-        cat("Iteration ",converge_i,", tol=",converge[converge_i],".\n")
+        message("Iteration ",converge_i,", tol = ",converge[converge_i],".")
       }
     }
 
@@ -301,7 +301,7 @@ relax_and_split_ICA <- function(
 #' data(example_sim123)
 #'
 #' select_sparseICA = BIC_sparseICA(xData = example_sim123$xmat, n.comp = 3, 
-#'       method="C", BIC_plot = TRUE,verbose=FALSE, nu_list = seq(0.1,4,0.1))
+#'       method="C", BIC_plot = TRUE,verbose = TRUE, nu_list = seq(0.1,4,0.1))
 #'
 #' (my_nu = select_sparseICA$best_nu)
 #' }
@@ -322,14 +322,14 @@ BIC_sparseICA <- function(
   orth.method <- match.arg(orth.method)
   method <- match.arg(method)
   
-  if (verbose) cat("Centering and scaling data.\n")
+  if (verbose) message("Centering and scaling data.")
   
   # Center data
   xData_centered <- scale(xData, center = TRUE, scale = FALSE)
   v <- nrow(xData)
   t <- ncol(xData)
   
-  if (verbose) cat("Initializing reference Sparse ICA.\n")
+  if (verbose) message("Initializing reference Sparse ICA.")
   
   # Run reference Sparse ICA with very small `nu`
   ref_sparseICA <- relax_and_split_ICA(
@@ -345,7 +345,7 @@ BIC_sparseICA <- function(
   # Initialize storage for BIC values
   out_BIC <- numeric(length(nu_list))
   
-  if (verbose) cat("Starting BIC calculation over", length(nu_list), "nu values.\n")
+  if (verbose) message("Starting BIC calculation over ",length(nu_list)," nu values.")
   
   # Loop through `nu_list`
   for (i in seq_along(nu_list)) {
@@ -375,7 +375,7 @@ BIC_sparseICA <- function(
   # Select best `nu` based on minimum BIC
   best_nu <- nu_list[which.min(out_BIC)]
   
-  if (verbose) cat("The best nu selected by BIC is", best_nu, ".\n")
+  if (verbose) message("The best nu selected by BIC is ", best_nu, ".")
   
   # Optional BIC plot
   if (BIC_plot) {
@@ -390,7 +390,7 @@ BIC_sparseICA <- function(
     best_nu = best_nu
   )
   
-  if (verbose) print(Sys.time() - start.time)
+  if (verbose) message("BIC selection completed in ",round(difftime(Sys.time(),start.time,units = "secs"),2)," seconds.")
   return(result)
 }
 
@@ -447,10 +447,12 @@ BIC_sparseICA <- function(
 #' res_matched <- matchICA(my_sparseICA$estS,example_sim123$smat)
 #'
 #' # Visualize the estimated components
+#' oldpar <- par()$mfrow
 #' par(mfrow=c(1,3))
 #' image(matrix(res_matched[,1],33,33))
 #' image(matrix(res_matched[,2],33,33))
 #' image(matrix(res_matched[,3],33,33))
+#' par(mfrow=oldpar)
 #' }
 #' 
 #' @export
@@ -462,10 +464,10 @@ sparseICA <- function(
     verbose = TRUE, BIC_verbose = FALSE, converge_plot = FALSE, col.stand = TRUE,
     row.stand = FALSE, iter.stand = 5, positive_skewness = TRUE
 ) {
-  start.time <- Sys.time()
+  start.time1 <- Sys.time()
   
   if(nu == "BIC"){
-    if (verbose) cat("Selecting optimal nu using BIC-like criterion.\n")
+    if (verbose) message("Selecting the optimal nu using BIC-like criterion.")
     BIC_result <- BIC_sparseICA(
       xData = xData, n.comp = n.comp, nu_list = nu_list,
       whiten = whiten, lngca = lngca, orth.method = orth.method,
@@ -473,7 +475,7 @@ sparseICA <- function(
       verbose = BIC_verbose, col.stand = col.stand, row.stand = row.stand,
       iter.stand = iter.stand, BIC_plot = FALSE)
     nu <- BIC_result$best_nu
-    if (verbose) cat("The optimal nu is",nu,".\n")
+    if (verbose) message("The optimal nu is ",nu,".")
     
     sparseICA_result <- relax_and_split_ICA(
       xData = xData, n.comp = n.comp, U.list = U.list,
@@ -489,7 +491,7 @@ sparseICA <- function(
     sparseICA_result$BIC <- BIC_result$BIC
     sparseICA_result$nu_list <- BIC_result$nu_list
     
-    if (verbose) print(Sys.time() - start.time)
+    if (verbose) message("SparseICA is completed in ",round(difftime(Sys.time(),start.time1,units = "secs"),2)," seconds.")
     
     return(sparseICA_result)
   } else {
@@ -503,7 +505,7 @@ sparseICA <- function(
       positive_skewness = positive_skewness
     )
     
-    if (verbose) print(Sys.time() - start.time)
+    if (verbose) message("SparseICA is completed in ",round(difftime(Sys.time(),start.time1,units = "secs"),2)," seconds.")
     
     return(sparseICA_result)
   }

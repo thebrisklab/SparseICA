@@ -70,7 +70,7 @@ This function uses a BIC-like criterion to select the optimal tuning parameter \
 data(example_sim123)
 
 select_sparseICA = BIC_sparseICA(xData = example_sim123$xmat, n.comp = 3, 
-      method="C", BIC_plot = TRUE,verbose=FALSE, nu_list = seq(0.1,4,0.1))
+      method="C", BIC_plot = TRUE,verbose = TRUE, nu_list = seq(0.1,4,0.1))
 
 (my_nu = select_sparseICA$best_nu)
 }

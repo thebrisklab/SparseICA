@@ -11,7 +11,8 @@ gen_groupPC(
   ncore = 1,
   npc = 85,
   iter_std = 5,
-  brainstructures = c("left", "right")
+  brainstructures = c("left", "right"),
+  verbose = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ gen_groupPC(
 \item{iter_std}{An integer specifying the number of iterative standardization steps to apply to fMRI data. Default is 5.}
 
 \item{brainstructures}{A character vector specifying the brain structures to include in the analysis. Options are \code{"left"} (left cortex), \code{"right"} (right cortex), and/or \code{"subcortical"} (subcortex and cerebellum). Can also be \code{"all"} (obtain all three brain structures). Default is \code{c("left", "right")}.}
+
+\item{verbose}{A logical value indicating whether to print convergence information during execution. Default is \code{TRUE}.}
 }
 \value{
 A numeric matrix containing the group-level principal components, with dimensions determined by the number of retained components (\code{n.comp}) and the concatenated data across all subjects.
@@ -37,14 +40,4 @@ This function computes subject-level principal components (PCs) from fMRI data a
 }
 \details{
 NOTE: This function requires the \code{ciftiTools} package to be installed, and set up the path to the Connectome Workbench folder by \code{ciftiTools.setOption()}. See the package \code{ciftiTools} documentation for more information.
-}
-\examples{
-# Example usage:
-# library(ciftiTools)
-# ciftiTools.setOption('wb_path', '/Applications/workbench')
-# Assuming `bids_dir` is the path to a BIDS dataset,
-# and `subject_list` is a named list of fMRI files:
-# groupPC <- gen_groupPC(bids_path = bids_dir, subj_list = subject_list, n.comp = 30, npc = 85)
-# print(dim(groupPC))
-
 }

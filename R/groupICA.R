@@ -60,33 +60,25 @@ create_group_list <- function(bids_path,pattern = "task-rest.*\\.dtseries\\.nii$
 #' @param npc An integer specifying the number of components to retain during subject-level PCA. Default is 85.
 #' @param iter_std An integer specifying the number of iterative standardization steps to apply to fMRI data. Default is 5.
 #' @param brainstructures A character vector specifying the brain structures to include in the analysis. Options are \code{"left"} (left cortex), \code{"right"} (right cortex), and/or \code{"subcortical"} (subcortex and cerebellum). Can also be \code{"all"} (obtain all three brain structures). Default is \code{c("left", "right")}.
+#' @param verbose A logical value indicating whether to print convergence information during execution. Default is \code{TRUE}.
 #'
 #' @return A numeric matrix containing the group-level principal components, with dimensions determined by the number of retained components (\code{n.comp}) and the concatenated data across all subjects.
 #'
 #' @details
 #' NOTE: This function requires the \code{ciftiTools} package to be installed, and set up the path to the Connectome Workbench folder by \code{ciftiTools.setOption()}. See the package \code{ciftiTools} documentation for more information.
 #'
-#' @examples
-#' # Example usage:
-#' # library(ciftiTools)
-#' # ciftiTools.setOption('wb_path', '/Applications/workbench')
-#' # Assuming `bids_dir` is the path to a BIDS dataset,
-#' # and `subject_list` is a named list of fMRI files:
-#' # groupPC <- gen_groupPC(bids_path = bids_dir, subj_list = subject_list, n.comp = 30, npc = 85)
-#' # print(dim(groupPC))
-#'
 #' @import ciftiTools
 #' @import irlba
 #' @import parallel
 #' @export
 gen_groupPC <- function(bids_path, subj_list, n.comp = 30, ncore=1,
-                        npc = 85, iter_std = 5, brainstructures = c("left", "right")) {
+                        npc = 85, iter_std = 5, brainstructures = c("left", "right"),verbose = TRUE) {
   
-  cat("# Start generating group PC of", length(subj_list), "subjects. #\n")
+  if (verbose) message("# Start generating group PC of", length(subj_list), "subjects. #")
   
   process_subject <- function(subject_name, subject_files) {
     nfile <- length(subject_files)
-    cat("##", subject_name, "has", nfile, "cortical surface fMRI data. ##\n")
+    if (verbose) message("##", subject_name, "has", nfile, "cortical surface fMRI data. ##")
     
     dat <- c()
     for (j in 1:nfile) {
@@ -107,14 +99,14 @@ gen_groupPC <- function(bids_path, subj_list, n.comp = 30, ncore=1,
       }
       dat <- cbind(dat, xii_mat)
     }
-    cat("## Total number of TRs:", dim(dat)[2], ".##\n")
+    if (verbose) message("## Total number of TRs:", dim(dat)[2], ".##")
     
     # Perform PCA
     subj_PCA <- prcomp_irlba(dat, npc)
     PC_subj <- subj_PCA$x
     dimnames(PC_subj) <- NULL
     
-    cat("## Retained", npc, "PCs. ##\n")
+    if (verbose) message("## Retained", npc, "PCs. ##")
     return(PC_subj)
   }
   
@@ -126,13 +118,13 @@ gen_groupPC <- function(bids_path, subj_list, n.comp = 30, ncore=1,
   
   # Combine all subject PCs
   groupPC <- do.call(cbind, groupPC_list)
-  cat("# Finish subject-level PCA! The concatenated matrix has dimension", dim(groupPC), ". #\n")
+  if (verbose) message("# Finish subject-level PCA! The concatenated matrix has dimension", dim(groupPC), ". #")
   
   # Perform group PCA
   temp <- whitener(X = groupPC, n.comp = n.comp, use_irlba = TRUE)
   groupPC <- temp$Z
   
-  cat("# Finish group PCA. #\n")
+  if (verbose) message("# Finish group PCA. #")
   return(groupPC)
 }
 
@@ -182,12 +174,6 @@ gen_groupPC <- function(bids_path, subj_list, n.comp = 30, ncore=1,
 #'   \item Executes Sparse ICA on the group-level PCs to estimate independent components.
 #' }
 #'
-#' @examples
-#' # Example usage:
-#' # Assuming `bids_dir` is the path to a BIDS dataset:
-#' # result <- group_sparseICA(bids_path = bids_dir, n.comp = 30, nu = "BIC")
-#' # str(result)
-#'
 #' @seealso \code{\link{create_group_list}}, \code{\link{gen_groupPC}}, \code{\link{BIC_sparseICA}}, \code{\link{sparseICA}}
 #' @export
 group_sparseICA <- function(bids_path, subj_list = NULL, nu = "BIC",
@@ -198,51 +184,51 @@ group_sparseICA <- function(bids_path, subj_list = NULL, nu = "BIC",
                             verbose = TRUE, BIC_verbose = FALSE, converge_plot = FALSE){
   
   if(verbose){
-    cat("##################################\n")
-    cat("##### Start group Sparse ICA #####\n")
-    cat("##################################\n\n")
-    cat("+++++ Step 1: Create subject list +++++\n")
+    message("##################################")
+    message("##### Start group Sparse ICA #####")
+    message("##################################")
+    message("+++++ Step 1: Create subject list +++++")
   }
   
   if(is.null(subj_list)){
     subj_list <- create_group_list(bids_path)
     if(verbose){
-      cat("# No input subject list, create using given path to BIDS. #\n")
-      cat("## Detect",length(subj_list),"subjects to be included. ##\n")
+      message("# No input subject list, create using given path to BIDS. #")
+      message("## Detect",length(subj_list),"subjects to be included. ##")
     }
   }else{
-    cat("# Use given subject list. #\n")
-    cat("## Detect",length(subj_list),"subjects to be included. ##\n")
+    message("# Use given subject list. #")
+    message("## Detect",length(subj_list),"subjects to be included. ##")
   }
   
   if(verbose){
-    cat("+++++ Step 2: Perform subject level PCA +++++\n")
+    message("+++++ Step 2: Perform subject level PCA +++++")
   }
   
   PC_group <- gen_groupPC(bids_path=bids_path,
                           subj_list = subj_list,
                           ncore = ncore,
                           n.comp = n.comp,
-                          npc = npc,iter_std = iter_std,brainstructures = brainstructures)
+                          npc = npc,iter_std = iter_std,brainstructures = brainstructures,verbose = verbose)
   
   if(verbose){
-    cat("+++++ Step 3: Select the tuning parameter +++++\n")
+    message("+++++ Step 3: Select the tuning parameter +++++")
   }
   
   if(nu == "BIC"){
-    cat("# Select nu by BIC. #\n")
+    if (verbose) message("# Select nu by BIC. #")
     nu_selection <- BIC_sparseICA(xData = PC_group, n.comp = n.comp, whiten = "none",method = method, 
                                   use_irlba = use_irlba,eps = eps,maxit = maxit,
                                   BIC_plot = BIC_plot,nu_list = nu_list,verbose=BIC_verbose)
     my_nu <- nu_selection$best_nu
-    cat("## The selected nu is",my_nu,". ##\n")
+    if (verbose) message("## The selected nu is",my_nu,". ##")
   }else{
     my_nu <- nu
-    cat("# Use given nu = ",my_nu,". #")
+    if (verbose) message("# Use given nu = ",my_nu,". #")
   }
   
   if(verbose){
-    cat("+++++ Step 4: Perform Sparse ICA on group PC +++++\n")
+    message("+++++ Step 4: Perform Sparse ICA on group PC +++++")
   }
   
   my_group_sparseICA <- sparseICA(xData = PC_group,
@@ -258,9 +244,9 @@ group_sparseICA <- function(bids_path, subj_list = NULL, nu = "BIC",
   my_group_sparseICA$nu_list <- nu_selection$nu_list
     
   if(verbose){
-    cat("###################################\n")
-    cat("##### Finish group Sparse ICA #####\n")
-    cat("###################################\n")
+    message("###################################")
+    message("##### Finish group Sparse ICA #####")
+    message("###################################")
   }
   
   return(my_group_sparseICA)

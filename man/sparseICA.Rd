@@ -96,10 +96,12 @@ my_sparseICA <- sparseICA(xData = example_sim123$xmat, n.comp = 3, nu = "BIC", m
 res_matched <- matchICA(my_sparseICA$estS,example_sim123$smat)
 
 # Visualize the estimated components
+oldpar <- par()$mfrow
 par(mfrow=c(1,3))
 image(matrix(res_matched[,1],33,33))
 image(matrix(res_matched[,2],33,33))
 image(matrix(res_matched[,3],33,33))
+par(mfrow=oldpar)
 }
 
 }
